@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#315d42">
+<title>葛生レストランNAVI</title>
+<style>
+:root{--green:#315d42;--pale:#edf5eb;--line:#c8dcc5;--text:#233027;--muted:#6e776f;--card:#fff;--bg:#f5f3ec;--accent:#b94736}
+*{box-sizing:border-box} body{margin:0;background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",sans-serif;color:var(--text)}
+.wrap{max-width:720px;margin:0 auto;min-height:100vh;background:#faf9f5;box-shadow:0 0 28px rgba(0,0,0,.06)}
+header{padding:28px 18px 20px;background:linear-gradient(145deg,#315d42,#4e785c);color:white}
+header small{font-size:11px;letter-spacing:.18em;opacity:.8} header h1{margin:7px 0 8px;font-size:30px;letter-spacing:.02em} header p{margin:0;font-size:14px;line-height:1.7;opacity:.92}
+.update-summary{margin:14px 16px 10px;padding:12px 14px;border-radius:14px;background:var(--pale);border:1px solid var(--line);font-size:12px;line-height:1.6;color:var(--green)}
+.toolbar{padding:8px 16px 4px;position:sticky;top:0;background:rgba(250,249,245,.95);backdrop-filter:blur(8px);z-index:5}
+.search{width:100%;padding:12px 14px;border:1px solid #d8ddd7;border-radius:12px;background:white;font-size:15px;outline:none}
+.filters{display:flex;gap:7px;overflow:auto;padding:10px 0 8px;scrollbar-width:none}.filters::-webkit-scrollbar{display:none}.filter{white-space:nowrap;border:1px solid var(--line);background:white;color:var(--green);border-radius:999px;padding:8px 12px;font-size:12px;font-weight:700}.filter.active{background:var(--green);color:white}
+.count{padding:2px 18px 8px;color:var(--muted);font-size:12px}
+.list{padding:0 16px 20px;display:grid;gap:12px}.card{background:var(--card);border:1px solid #e3e4df;border-radius:17px;overflow:hidden;box-shadow:0 4px 14px rgba(0,0,0,.04)}
+.photo{width:100%;aspect-ratio:16/9;background:linear-gradient(145deg,#e9eee7,#d9e4d7);display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}.photo img{width:100%;height:100%;object-fit:cover;display:block}.photo .pending{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;color:#607064;font-size:12px;font-weight:700}.photo .pending span{font-size:34px}.photo-credit{position:absolute;right:8px;bottom:7px;background:rgba(0,0,0,.58);color:#fff;padding:4px 7px;border-radius:7px;font-size:9px;text-decoration:none}
+.top{display:flex;gap:12px;padding:15px}.icon{width:66px;height:66px;flex:none;border-radius:15px;display:grid;place-items:center;background:var(--pale);font-size:30px}.main{min-width:0;flex:1}.name-row{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}.name{font-size:18px;font-weight:800;margin:0}.cat{font-size:10px;border-radius:999px;background:#f0efe9;padding:5px 8px;white-space:nowrap}.area{font-size:12px;color:var(--green);font-weight:700;margin-top:4px}.desc{font-size:12px;line-height:1.55;color:#59625b;margin-top:6px}
+.info{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#e7e8e4;border-top:1px solid #e7e8e4}.info div{background:#fff;padding:10px 12px;font-size:11px;line-height:1.5}.info b{color:#69736b;font-weight:700}.actions{display:grid;grid-template-columns:1fr 1fr 1fr;border-top:1px solid #e7e8e4}.actions a{padding:12px 4px;text-align:center;text-decoration:none;color:var(--green);font-weight:800;font-size:12px;border-right:1px solid #e7e8e4}.actions a:first-child{background:var(--green);color:white}.actions a:last-child{border-right:0}.actions .disabled{color:#aaa;pointer-events:none}
+.notice{margin:0 16px 12px;padding:11px 13px;background:#fff7e8;border:1px solid #ead8b6;border-radius:13px;font-size:11px;line-height:1.6;color:#765d32}.empty{padding:30px;text-align:center;color:#777}.footer{padding:8px 18px 34px;color:#777;font-size:10px;line-height:1.7}.badge{display:inline-block;margin-left:6px;background:#fff3e0;color:#9a5e16;padding:2px 6px;border-radius:6px;font-size:9px}
+</style>
+</head>
+<body><div class="wrap">
+<header><small>KUZUU FOOD GUIDE</small><h1>葛生レストランNAVI</h1><p>葛生で、今日は何を食べる？<br>地域とジャンルから、今日の一軒を。</p></header>
+<div id="update-summary" class="update-summary"><b>✓ 自動更新チェック</b><br>店舗情報の更新状況を確認しています。</div>
+<div class="notice"><b>掲載方針</b><br>旧葛生地区の店内飲食店を中心に掲載。閉業確認店・一時休業店は通常一覧から除外しています。店舗写真は確認できたものから掲載しています。</div>
+<div class="toolbar"><input id="q" class="search" placeholder="店名・地域・料理で検索"><div id="filters" class="filters"></div></div>
+<div id="count" class="count"></div><main id="list" class="list"></main>
+<div class="footer">※営業時間・定休日等は公開情報をもとにした参考情報です。来店前に各店舗へご確認ください。<br>※「Web検索」は店舗名をGoogle検索します。</div>
+</div>
+<script>
+const shops=[
+{id:1,photo:'https://livedoor.blogimg.jp/kazama1600/imgs/3/5/35308519.jpg',photoPage:'https://tabelog.com/tochigi/A0902/A090202/9010449/dtlphotolst/smp2/',name:'あづま食堂 本店',area:'葛生東',cat:'ラーメン',addr:'栃木県佐野市葛生東1-3-17',hours:'要確認',closed:'月曜（公開情報）',phone:'0283-85-2366',desc:'葛生駅近くの昔ながらの食堂・ラーメン店。'},
+{id:2,name:'Street Coffee とらべる',area:'葛生東',cat:'カフェ',addr:'栃木県佐野市葛生東1-12-5',hours:'10:00〜18:00',closed:'月曜',phone:'',desc:'葛生中心部のコーヒーショップ・喫茶店。'},
+{id:3,photo:'https://sano-kankokk.jp/wp-content/uploads/2022/09/image2.jpeg',photoPage:'https://sano-kankokk.jp/?gourmet=%E9%BA%BA%E5%B1%8B-%E8%B5%A4%E5%A0%80',name:'麺や 赤堀',area:'葛生東',cat:'ラーメン',addr:'栃木県佐野市葛生東1-13-3',hours:'11:00〜14:30',closed:'土曜・第1/第3/第5金曜',phone:'0283-85-7265',desc:'生姜を合わせた佐野ラーメンで知られる店。'},
+{id:4,photo:'https://blog-imgs-174.fc2.com/j/i/v/jiveo418/DSC08141.jpeg',photoPage:'https://ramentochigi.fc2.net/blog-entry-303.html',name:'ととや',area:'葛生東',cat:'和食・定食',addr:'栃木県佐野市葛生東1-13-3',hours:'11:30〜14:00 / 夜営業あり',closed:'月曜',phone:'0283-85-2258',desc:'海鮮・定食・居酒屋。昼と夜に使える一軒。'},
+{id:5,photo:'https://blog-imgs-203.fc2.com/j/i/v/jiveo418/DSC06670.jpeg',photoPage:'https://ramentochigi.fc2.net/blog-entry-149.html',name:'さのや',area:'葛生東',cat:'そば・うどん',addr:'栃木県佐野市葛生東1-13-4',hours:'要確認',closed:'要確認',phone:'0283-85-2369',desc:'そば・うどん・ラーメンを扱う昔ながらの食事処。'},
+{id:6,photo:'https://blog-imgs-174.fc2.com/j/i/v/jiveo418/DSC08311.jpeg',photoPage:'https://ramentochigi.fc2.net/blog-entry-318.html',name:'北京飯店',area:'葛生東',cat:'中華',addr:'栃木県佐野市葛生東2-10-3',hours:'要確認',closed:'木曜',phone:'0283-86-3330',desc:'ラーメン、中華料理、かつ丼などの町中華。'},
+{id:7,photo:'https://www.tochinavi.net/img/spot/01/IMG01_73c478cd648fb6a948272b86d49d56020fcbea8d.jpg?1604297602=',photoPage:'https://www.tochinavi.net/spot/home/?id=19223',name:'かたやま庵',area:'葛生東',cat:'そば・うどん',addr:'栃木県佐野市葛生東3-1-8',hours:'11:30〜14:00 / 17:00〜20:00',closed:'火曜',phone:'0283-85-3922',desc:'そばに加え、ハンバーグやとんかつも人気。'},
+{id:8,photo:'https://www.tochinavi.net/img/kuchikomi/02/CP_IMG01_636a5520e3740b05a798724b98945f16b2f972ec.jpg',photoPage:'https://www.tochinavi.net/spot/home/?id=23712',name:'和み珈琲',area:'葛生東',cat:'カフェ',addr:'栃木県佐野市葛生東3-10-23',hours:'11:30〜17:00',closed:'火・水・木曜／不定休あり',phone:'0283-55-5775',desc:'落ち着いた雰囲気のカフェ・喫茶。'},
+{id:9,name:'鮨廣',area:'葛生西',cat:'寿司',addr:'栃木県佐野市葛生西3-13-14',hours:'17:00〜22:00',closed:'木曜',phone:'0283-86-4600',desc:'葛生西の寿司・和食店。'},
+{id:10,name:'囍桜',area:'中町',cat:'中華',addr:'栃木県佐野市中町607-9',hours:'11:00〜14:00 / 17:00〜21:00',closed:'月曜',phone:'0283-55-7990',desc:'中町の中華料理店。昼・夜営業。'},
+{id:11,name:'そば膳 萱の舎',area:'中町',cat:'そば・うどん',addr:'栃木県佐野市中町735-1',hours:'11:00〜14:30',closed:'水曜',phone:'0283-86-2923',desc:'そば膳などを楽しめる蕎麦店。'},
+{id:12,photo:'https://www.tochinavi.net/img/spot/01/IMG01_7279aeeb3a79dacbdd89a045ef6bde16ff8a7273.jpg?1709042674=',photoPage:'https://www.tochinavi.net/spot/home/?id=22355',name:'味楽',area:'築地町',cat:'寿司',addr:'栃木県佐野市築地町2-11',hours:'11:00〜14:00 / 17:00〜21:00',closed:'水曜',phone:'0283-86-2739',desc:'寿司・そば・うなぎなど幅広い和食。'},
+{id:13,photo:'https://blog-imgs-160.fc2.com/j/i/v/jiveo418/DSC00503.jpeg',photoPage:'https://ramentochigi.fc2.net/blog-entry-519.html',name:'手打ラーメン 竹ノ屋',area:'豊代町',cat:'ラーメン',addr:'栃木県佐野市豊代町503-1',hours:'11:00〜14:00 / 17:00〜19:30',closed:'水曜',phone:'0283-84-1225',desc:'手打ちの佐野ラーメンと餃子。'},
+{id:14,name:'鈴庵',area:'豊代町',cat:'そば・うどん',addr:'栃木県佐野市豊代町710-3',hours:'11:00〜14:00 / 夜営業あり',closed:'火曜',phone:'0283-85-3333',desc:'そば・うどん・かつ丼などを楽しめる店。'},
+{id:15,name:'和食 花里',area:'牧町',cat:'和食・定食',addr:'栃木県佐野市牧町1977-1',hours:'要確認',closed:'要確認',phone:'',desc:'海鮮・揚げ物・日本料理を扱う和食店。'},
+{id:16,name:'でらっせ',area:'牧町',cat:'その他',addr:'栃木県佐野市牧町1977-1',hours:'要確認',closed:'要確認',phone:'',desc:'牧町でコース料理を提供するフレンチ。'},
+{id:17,name:'仙波そば加工販売部会',area:'仙波町',cat:'そば・うどん',addr:'栃木県佐野市仙波町2445-1',hours:'11:00〜14:00（土・日）',closed:'月〜金曜',phone:'0283-86-2918',desc:'農林漁家高齢者センター内。週末営業のそば処。'},
+{id:18,photo:'https://ximg.retty.me/crop/s400x400/q80/das/-/retty/img_repo/2l/01/32374475.jpg',photoPage:'https://retty.me/area/PRE09/ARE238/SUB23801/100000389429/',name:'手打ち蕎麦 かみやま',area:'秋山町',cat:'そば・うどん',addr:'栃木県佐野市秋山町305',hours:'11:00〜18:00',closed:'木曜',phone:'0283-87-0036',desc:'秋山町の山あいにある人気の手打ち蕎麦店。'},
+{id:19,name:'東林',area:'秋山町',cat:'和食・定食',addr:'栃木県佐野市秋山町53',hours:'ランチのみ（予約必須・会席料理コース）',closed:'要確認',phone:'090-2439-2051',desc:'秋山町の山間にある会席・懐石料理店。地元食材を使った季節の料理。'},
+{id:20,name:'あづまや',area:'水木町',cat:'和食・定食',addr:'栃木県佐野市水木町51-11',hours:'完全予約制',closed:'月曜',phone:'0283-87-0659',desc:'水木町の日本料理・懐石料理。完全予約制。'},
+{id:21,name:'もてなし家 赤部',area:'葛生東',cat:'カフェ',addr:'栃木県佐野市葛生東1-13-3 葛の里壱番館1F',hours:'9:30〜17:00',closed:'月曜',phone:'0283-85-7550',desc:'葛の里壱番館の飲食店。揚げたてのコロッケ、いもフライ、バーガーなど。'},
+{id:22,name:'駄菓子・カフェ もりもーり',area:'葛生東',cat:'カフェ',addr:'栃木県佐野市葛生東1-17-12',hours:'曜日により変動',closed:'要確認',phone:'0283-55-6486',desc:'駄菓子とカフェを楽しめる地域店。'},
+{id:23,name:'駅前ダイニングさら 築地町店',area:'築地町',cat:'居酒屋',addr:'栃木県佐野市築地町2-12',hours:'15:00〜21:00（営業日）',closed:'日・月・水曜（地図情報）',phone:'090-1849-1770',desc:'和洋の料理とワイン・日本酒を楽しめるダイニング。'}
+];
+const icons={'ラーメン':'🍜','そば・うどん':'🥢','和食・定食':'🍱','寿司':'🍣','中華':'🥟','カフェ':'☕','居酒屋':'🍶','その他':'🍽️'};
+const cats=['すべて','ラーメン','そば・うどん','和食・定食','寿司','中華','カフェ','居酒屋','その他']; let cat='すべて';
+const f=document.getElementById('filters'); cats.forEach(c=>{const b=document.createElement('button');b.className='filter'+(c==='すべて'?' active':'');b.textContent=c;b.onclick=()=>{cat=c;document.querySelectorAll('.filter').forEach(x=>x.classList.toggle('active',x.textContent===c));render()};f.appendChild(b)});
+document.getElementById('q').addEventListener('input',render);
+function enc(s){return encodeURIComponent(s)}
+function render(){const q=document.getElementById('q').value.trim().toLowerCase();const rows=shops.filter(s=>(cat==='すべて'||s.cat===cat)&&(!q||[s.name,s.area,s.cat,s.addr,s.desc].join(' ').toLowerCase().includes(q)));document.getElementById('count').textContent=`掲載 ${rows.length}店 / 全${shops.length}店`;const root=document.getElementById('list');root.innerHTML='';if(!rows.length){root.innerHTML='<div class="empty">該当する店舗がありません</div>';return}rows.forEach(s=>{const tel=s.phone?`<a href="tel:${s.phone.replace(/-/g,'')}">電話する</a>`:`<a class="disabled">電話なし</a>`;const photo=s.photo?`<div class="photo"><img src="${s.photo}" alt="${s.name} 店舗写真" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.innerHTML='<div class=\"pending\"><span>${icons[s.cat]||'🍽️'}</span>写真を読み込めません</div>'"><a class="photo-credit" href="${s.photoPage||s.photo}" target="_blank" rel="noopener">写真出典</a></div>`:`<div class="photo"><div class="pending"><span>${icons[s.cat]||'🍽️'}</span>店舗写真を確認中</div></div>`;root.insertAdjacentHTML('beforeend',`<section class="card">${photo}<div class="top"><div class="icon">${icons[s.cat]||'🍽️'}</div><div class="main"><div class="name-row"><h2 class="name">${s.name}</h2><span class="cat">${s.cat}</span></div><div class="area">${s.area}</div><div class="desc">${s.desc}</div></div></div><div class="info"><div><b>住所</b><br>${s.addr}</div><div><b>営業時間</b><br>${s.hours}</div><div><b>定休日</b><br>${s.closed}</div><div><b>電話</b><br>${s.phone||'要確認'}</div></div><div class="actions"><a target="_blank" href="https://www.google.com/maps/search/?api=1&query=${enc(s.name+' '+s.addr)}">地図を見る</a><a target="_blank" href="https://www.google.com/search?q=${enc(s.name+' 佐野市 '+s.area)}">Web検索</a>${tel}</div></section>`)});}
+render();
+
+(async function(){
+  try {
+    const res = await fetch('data/update-status.json?ts=' + Date.now(), {cache:'no-store'});
+    if (!res.ok) return;
+    const data = await res.json();
+    const checked = data.last_checked || '未実施';
+    const updates = Object.values(data.shops || {});
+    const count = updates.filter(x => x && x.updated).length;
+    const box = document.getElementById('update-summary');
+    if (!box) return;
+    if (count > 0) {
+      box.innerHTML = `<b>🆕 更新候補があります：${count}店</b><br>最終自動チェック：${checked}`;
+    } else {
+      box.innerHTML = `<b>✓ 自動更新チェック</b><br>現在、新しい更新候補はありません。<br>最終自動チェック：${checked}`;
+    }
+  } catch(e) {
+    console.log('update check error', e);
+  }
+})();
+</script></body></html>
