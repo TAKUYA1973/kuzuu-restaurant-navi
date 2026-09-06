@@ -1,0 +1,92 @@
+name: Fetch Shop Photos
+
+# 手動実行専用。承認済みURL(data/photo-sources.json)にもとづいて店舗写真を取得し、
+# images/ フォルダへの追加をPull Requestとして提出する。
+# index.html は一切変更しない。mainへの直接pushは行わない。
+on:
+  workflow_dispatch:
+    inputs:
+      shop_id:
+        description: "特定の店舗idのみ実行する場合はidを指定(空欄なら承認済み全件を処理)"
+        required: false
+        default: ""
+      dry_run:
+        description: "true にすると取得のみ行い、コミット・PR作成をスキップする"
+        required: false
+        default: "false"
+        type: boolean
+
+permissions:
+  contents: write
+  pull-requests: write
+
+# 同時実行による images/ フォルダへの競合書き込みを防ぐ
+concurrency:
+  group: fetch-shop-photos
+  cancel-in-progress: false
+
+jobs:
+  fetch-photos:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Verify shops data (pre-check)
+        run: node scripts/verify_shops.mjs index.html
+
+      - name: Fetch approved shop photos
+        env:
+          SHOP_ID_FILTER: ${{ github.event.inputs.shop_id }}
+        run: node scripts/fetch_photos.mjs
+
+      - name: "Verify shops data (post-check: index.html must be untouched)"
+        run: |
+          node scripts/verify_shops.mjs index.html
+          if ! git diff --quiet -- index.html; then
+            echo "::error::index.html が fetch_photos.mjs の実行によって変更されました。これは想定外です。"
+            git diff -- index.html
+            exit 1
+          fi
+
+      - name: Show fetch summary
+        if: always()
+        run: cat photo-fetch-summary.json || true
+
+      - name: Check for image changes
+        id: changes
+        run: |
+          git add images/
+          if git diff --cached --quiet; then
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create Pull Request
+        if: steps.changes.outputs.has_changes == 'true' && github.event.inputs.dry_run != 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "店舗写真を追加/更新 (fetch-shop-photos workflow)"
+          branch: "photo-update/${{ github.run_number }}"
+          title: "店舗写真の追加・更新 (自動取得 #${{ github.run_number }})"
+          body: |
+            `data/photo-sources.json` に登録された承認済みURLから取得した店舗写真です。
+            index.html は変更していません。内容を確認のうえ、問題なければmergeしてください。
+
+            取得結果サマリは Actions のログ(Show fetch summary ステップ)を参照してください。
+
+            このPRはワークフロー `fetch-shop-photos.yml` により自動作成されました。
+          add-paths: |
+            images/
+          delete-branch: true
+
+      - name: Dry run notice
+        if: github.event.inputs.dry_run == 'true'
+        run: echo "dry_run=true のため、コミット・PR作成をスキップしました。images/ の内容はこのジョブ内でのみ確認できます。"

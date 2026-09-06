@@ -1,0 +1,128 @@
+{
+  "_instructions": "承認済みの店舗写真URLだけをここに登録してください。各エントリは url が空文字、または approved が false の場合はワークフローでスキップされます(取得対象になりません)。取得対象にするには、目視確認したうえで url と source_page を記入し、approved を true にしてcommitしてください。id は index.html の shops 配列の id と、slug は images/ フォルダ内のファイル名(拡張子除く)と一致します。slug は英数字とハイフンのみを使用してください。id が protected_ids に含まれる店舗は、このファイルに何が書かれていてもワークフロー側で常にスキップされます。",
+  "schema_version": 1,
+  "protected_ids": [2],
+  "protected_note": "id:2 (Street Coffee とらべる / street-coffee-toravel.jpeg) は既に確認済みの写真が設定済みのため、このファイルの内容にかかわらずワークフローの取得対象から常に除外されます。",
+  "shops": [
+    {
+      "id": 3,
+      "name": "麺や 赤堀",
+      "addr": "栃木県佐野市葛生東1-13-3",
+      "slug": "menya-akabori",
+      "url": "",
+      "source_page": "",
+      "approved": false,
+      "note": "現在の写真(sano-kankokk.jp)は店内フレスコ画の可能性があり再検証中。外観写真の候補: 公式サイト https://menya-akabori.com/ 、公式X/Instagram @menyaakabori"
+    },
+    {
+      "id": 9,
+      "name": "鮨廣",
+      "addr": "栃木県佐野市葛生西3-13-14",
+      "slug": "sushihiro",
+      "url": "",
+      "source_page": "",
+      "approved": false,
+      "note": "候補: 公式サイト http://www.sushihiro-sano.com 、公式Facebook"
+    },
+    {
+      "id": 10,
+      "name": "囍桜",
+      "addr": "栃木県佐野市中町607-9",
+      "slug": "kizakura",
+      "url": "",
+      "source_page": "",
+      "approved": false,
+      "note": "候補記事: https://hashukage.blog.jp/archives/37350008.html (店構えの記述あり)"
+    },
+    {
+      "id": 11,
+      "name": "そば膳 萱の舎",
+      "addr": "栃木県佐野市中町735-1",
+      "slug": "kayanoya",
+      "url": "",
+      "source_page": "",
+      "approved": false,
+      "note": "外観写真の候補未確認"
+    },
+    {
+      "id": 14,
+      "name": "鈴庵",
+      "addr": "栃木県佐野市豊代町710-3",
+      "slug": "suzuan",
+      "url": "",
+      "source_page": "",
+      "approved": false,
+      "note": "候補: 公式サイト https://soba-suzuan.com/ 、公式Instagram @suzuan.sano.soba"
+    },
+    {
+      "id": 15,
+      "name": "和食 花里",
+      "addr": "栃木県佐野市牧町1977-1",
+      "slug": "hanasato",
+      "url": "",
+      "source_page": "",
+      "approved": false,
+      "note": "外観写真の候補未確認"
+    },
+    {
+      "id": 16,
+      "name": "でらっせ",
+      "addr": "栃木県佐野市牧町1977-1",
+      "slug": "derasse",
+      "url": "",
+      "source_page": "",
+      "approved": false,
+      "note": "営業実態を含めて情報が乏しい。削除はせず現状維持。"
+    },
+    {
+      "id": 17,
+      "name": "仙波そば加工販売部会",
+      "addr": "栃木県佐野市仙波町2445-1",
+      "slug": "senba-soba",
+      "url": "",
+      "source_page": "",
+      "approved": false,
+      "note": "外観写真の候補未確認"
+    },
+    {
+      "id": 19,
+      "name": "東林",
+      "addr": "栃木県佐野市秋山町53",
+      "slug": "torin",
+      "url": "",
+      "source_page": "",
+      "approved": false,
+      "note": "候補記事: https://ameblo.jp/subang-jaya/entry-12914842736.html (古民家の外観描写あり)"
+    },
+    {
+      "id": 20,
+      "name": "あづまや",
+      "addr": "栃木県佐野市水木町51-11",
+      "slug": "azumaya",
+      "url": "",
+      "source_page": "",
+      "approved": false,
+      "note": "外観写真の候補未確認"
+    },
+    {
+      "id": 21,
+      "name": "もてなし家 赤部",
+      "addr": "栃木県佐野市葛生東1-13-3 葛の里壱番館1F",
+      "slug": "motenashiya-akabe",
+      "url": "",
+      "source_page": "",
+      "approved": false,
+      "note": "同建物(葛の里壱番館)に麺や赤堀・ととや・さのやも入居。建物外観だけでは店舗を特定できないため採用要検討。"
+    },
+    {
+      "id": 22,
+      "name": "駄菓子・カフェ もりもーり",
+      "addr": "栃木県佐野市葛生東1-17-12",
+      "slug": "morimori",
+      "url": "",
+      "source_page": "",
+      "approved": false,
+      "note": "候補: 公式Facebook facebook.com/morimori.20210508"
+    }
+  ]
+}
