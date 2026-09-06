@@ -9,10 +9,10 @@
       "name": "麺や 赤堀",
       "addr": "栃木県佐野市葛生東1-13-3",
       "slug": "menya-akabori",
-      "url": "",
-      "source_page": "",
-      "approved": false,
-      "note": "現在の写真(sano-kankokk.jp)は店内フレスコ画の可能性があり再検証中。外観写真の候補: 公式サイト https://menya-akabori.com/ 、公式X/Instagram @menyaakabori"
+      "url": "https://sano-kankokk.jp/wp-content/uploads/2022/09/image2.jpeg",
+      "source_page": "https://sano-kankokk.jp/?gourmet=%E9%BA%BA%E5%B1%8B-%E8%B5%A4%E5%A0%80",
+      "approved": true,
+      "note": "自動取得ワークフローの試運転用。現在の写真(sano-kankokk.jp)は店内フレスコ画の可能性があり、正式採用の可否は別途判断する。"
     },
     {
       "id": 9,
